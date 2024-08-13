@@ -1,21 +1,22 @@
-# Use an official PHP-Apache image as a parent image
+# Use the official PHP image with Apache
 FROM php:7.4-apache
 
-# Install required PHP extensions
-RUN docker-php-ext-install mysqli
+# Update package list and install necessary packages
+RUN apt-get update && \
+    apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd && \
+    docker-php-ext-install mysqli pdo pdo_mysql
 
-# Copy the HTML and PHP files to the Apache server directory
-COPY index.html /var/www/html/index.html
-COPY manage.php /var/www/html/manage.php
-COPY submit-data.php /var/www/html/submit-data.php
+# Enable Apache mod_rewrite (if needed)
+RUN a2enmod rewrite
 
-# Set proper ownership and permissions for the files
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Copy the PHP application code into the container
+COPY . /var/www/html/
 
-# Expose port 80 to the outside world
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+
+# Expose port 80 for HTTP
 EXPOSE 80
-
-# Start Apache server in the foreground
-CMD ["apache2-foreground"]
 
