@@ -4,8 +4,6 @@ services:
   web:
     image: pramod858/php-apache-web:latest
     container_name: php-apache-web
-    volumes:
-      - ./html:/var/www/html # Optional, if you still want to mount local files
     ports:
       - "8080:80"
     depends_on:
