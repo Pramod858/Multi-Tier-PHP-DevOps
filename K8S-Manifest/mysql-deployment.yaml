@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/data # Only for Minikube, ensure this path exists on your node. For EKS, use EBS or EFS.
+    path: /mnt/data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -42,7 +42,7 @@ spec:
             - containerPort: 3306
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "example"
+              value: "admin123"
             - name: MYSQL_DATABASE
               value: "testdb"
           volumeMounts:
