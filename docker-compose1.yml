@@ -11,14 +11,14 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASSWORD: example
+      DB_PASSWORD: admin123
       DB_NAME: testdb
 
   db:
     image: mysql:5.7
     container_name: mysql-db
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: admin123
       MYSQL_DATABASE: testdb
     volumes:
       - db_data:/var/lib/mysql
