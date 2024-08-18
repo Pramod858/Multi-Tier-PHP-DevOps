@@ -17,15 +17,15 @@ spec:
           image: pramod858/php-apache-web:latest
           ports:
             - containerPort: 80
-          env:
-            - name: DB_HOST
-              value: "mysql-db"
-            - name: DB_USER
-              value: "root"
-            - name: DB_PASSWORD
-              value: "admin123"
-            - name: DB_NAME
-              value: "testdb"
+          # env:
+          #   - name: DB_HOST
+          #     value: "mysql-db"
+          #   - name: DB_USER
+          #     value: "root"
+          #   - name: DB_PASSWORD
+          #     value: "admin123"
+          #   - name: DB_NAME
+          #     value: "testdb"
 ---
 apiVersion: v1
 kind: Service
