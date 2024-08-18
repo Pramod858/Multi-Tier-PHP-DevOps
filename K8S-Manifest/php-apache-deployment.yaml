@@ -23,7 +23,7 @@ spec:
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD
-              value: "example"
+              value: "admin123"
             - name: DB_NAME
               value: "testdb"
 ---
@@ -36,7 +36,7 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080 # You can set it to whatever you like, Minikube uses NodePort
+      nodePort: 30080 
   selector:
     app: php-apache-web
 
