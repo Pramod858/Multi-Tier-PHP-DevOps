@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache-web
+  template:
+    metadata:
+      labels:
+        app: php-apache-web
+    spec:
+      containers:
+        - name: php-apache-web
+          image: pramod858/php-apache-web:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache-web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+  selector:
+    app: php-apache-web
