@@ -4,8 +4,6 @@ services:
   web:
     build: .
     container_name: php-apache-web
-    volumes:
-      - ./html:/var/www/html
     ports:
       - "8080:80"
     depends_on:
