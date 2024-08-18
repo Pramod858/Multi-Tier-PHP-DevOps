@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache-web
+  template:
+    metadata:
+      labels:
+        app: php-apache-web
+    spec:
+      containers:
+        - name: php-apache-web
+          image: pramod858/php-apache-web:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "mysql-db"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "example"
+            - name: DB_NAME
+              value: "testdb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache-web
+spec:
+  type: NodePort # Use LoadBalancer if on cloud
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080 # You can set it to whatever you like, Minikube uses NodePort
+  selector:
+    app: php-apache-web
+
