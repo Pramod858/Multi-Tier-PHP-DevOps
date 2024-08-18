@@ -32,11 +32,10 @@ kind: Service
 metadata:
   name: php-apache-web
 spec:
-  type: NodePort # Use LoadBalancer if on cloud
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080 
   selector:
     app: php-apache-web
 
