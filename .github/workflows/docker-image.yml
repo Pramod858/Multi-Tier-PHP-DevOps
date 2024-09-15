@@ -18,7 +18,7 @@ jobs:
       - name: build-docker-image
         id: build-image
         run: |
-          docker build -f Dockerfile -t pramod858/php-web-app:latest
+          docker build -f Dockerfile -t pramod858/php-web-app:latest .
 
       - name: push-to-dockerhub
         id: push-image
