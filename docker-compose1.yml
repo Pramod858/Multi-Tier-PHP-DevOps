@@ -2,27 +2,28 @@ version: '3.8'
 
 services:
   web:
-    image: pramod858/php-apache-web:latest
-    container_name: php-apache-web
+    image: pramod858/php-web-app:latest
+    container_name: php-web-app
     ports:
       - "8080:80"
-    depends_on:
-      - db
     environment:
-      DB_HOST: db
-      DB_USER: root
+      DB_HOST: mysql
+      DB_USER: dbuser
       DB_PASSWORD: admin123
-      DB_NAME: testdb
+      DB_NAME: mydb
+    depends_on:
+      - mysql
 
-  db:
+  mysql:
     image: mysql:5.7
-    container_name: mysql-db
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: admin123
-      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: admin123
     volumes:
       - db_data:/var/lib/mysql
 
 volumes:
   db_data:
-
