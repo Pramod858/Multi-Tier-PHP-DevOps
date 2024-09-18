@@ -72,7 +72,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 [
     {
     "name": "${var.container_name}",
-    "image": "${var.image_name}",
+    "image": "${var.image_name}:${var.image_version}",
     "essential": true,
     "portMappings": [
         {
