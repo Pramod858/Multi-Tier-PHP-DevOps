@@ -26,6 +26,7 @@ module "ecs" {
     source                    = "./modules/ecs"
 
     depends_on                = [ module.vpc, module.rds ]
+    region                    = var.region
     environment               = var.environment
     vpc_id                    = module.vpc.vpc_id
     public_subnet_1_id        = module.vpc.public_subnet_1_id
@@ -46,7 +47,7 @@ module "ecs" {
             {"name": "DB_USER", "value": "${var.username}"},
             {"name": "DB_PASSWORD", "value": "${var.password}"},
             {"name": "DB_NAME", "value": "${var.db_name}"}
-        ]
+        ],
     EOF
 }
 
