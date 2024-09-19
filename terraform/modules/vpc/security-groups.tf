@@ -37,7 +37,7 @@ resource "aws_security_group" "database_sg" {
         from_port       = 3306
         to_port         = 3306
         protocol        = "tcp"
-        security_groups = [aws_security_group.ecs_sg.id]
+        security_groups = [aws_security_group.ecs_sg.id, aws_security_group.bastion_secuity_group.id]
     }
 
     egress {
@@ -47,6 +47,8 @@ resource "aws_security_group" "database_sg" {
         cidr_blocks      = ["0.0.0.0/0"]
         ipv6_cidr_blocks = ["::/0"]
     }
+
+    depends_on = [ aws_security_group.ecs_sg, aws_security_group.bastion_secuity_group ]
 
     tags = {
         Name = "${var.environment}-database-sg"

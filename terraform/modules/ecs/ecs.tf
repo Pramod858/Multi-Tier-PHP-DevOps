@@ -37,6 +37,12 @@ resource "aws_lb_listener" "front_end" {
     }
 }
 
+resource "aws_cloudwatch_log_group" "ecs" {
+    name              = "/ecs/${var.environment}"
+    retention_in_days = 1
+}
+
+
 resource "aws_iam_role" "ecsTaskExecutionRole" {
     name               = "${var.environment}-ecsTaskExecutionRole"
     assume_role_policy = jsonencode({
@@ -81,6 +87,14 @@ resource "aws_ecs_task_definition" "task_definition" {
         }
     ],
     ${var.container_env_vars_config}
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-region": "${var.region}",
+            "awslogs-group": "/ecs/${var.environment}",
+            "awslogs-stream-prefix": "ecs"
+            }
+        }
     }
 ]
 EOF
