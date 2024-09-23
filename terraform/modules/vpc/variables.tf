@@ -31,6 +31,16 @@ variable "private_sb2_cidr" {
     default = "10.0.4.0/24"
 }
 
+variable "private_sb3_cidr" {
+    type    = string
+    default = "10.0.5.0/24"
+}
+
+variable "private_sb4_cidr" {
+    type    = string
+    default = "10.0.6.0/24"
+}
+
 variable "container_port" {
     type = number
 }

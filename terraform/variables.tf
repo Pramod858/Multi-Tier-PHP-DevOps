@@ -7,12 +7,12 @@ variable "region" {
     default = "us-east-1"
 }
 
-variable "username" {
+variable "db_username" {
     type = string
     default = "admin"
 }
 
-variable "password" {
+variable "db_password" {
     type = string
     default = "admin123"
 }

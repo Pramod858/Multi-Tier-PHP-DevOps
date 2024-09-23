@@ -5,11 +5,11 @@ variable "environment" {
 variable "region" {
     type = string
 }
-variable "private_subnet_1_id" {
+variable "private_subnet_3_id" {
     type = string
 }
 
-variable "private_subnet_2_id" {
+variable "private_subnet_4_id" {
     type = string
 }
 
@@ -21,10 +21,10 @@ variable "db_name" {
     type = string
 }
 
-variable "username" {
+variable "db_username" {
     type = string
 }
 
-variable "password" {
+variable "db_password" {
     type = string
 }

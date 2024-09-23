@@ -13,13 +13,13 @@ module "rds" {
     depends_on           = [ module.vpc ]
     environment          = var.environment
     region               = var.region 
-    private_subnet_1_id  = module.vpc.private_subnet_1_id
-    private_subnet_2_id  = module.vpc.private_subnet_2_id
+    private_subnet_3_id  = module.vpc.private_subnet_3_id
+    private_subnet_4_id  = module.vpc.private_subnet_4_id
     db_security_group_id = module.vpc.db_security_group_id
 
     db_name              = var.db_name
-    username             = var.username
-    password             = var.password
+    db_username             = var.db_username
+    db_password             = var.db_password
 }
 
 module "ecs" {
@@ -44,8 +44,8 @@ module "ecs" {
     container_env_vars_config = <<EOF
         "environment" : [
             {"name": "DB_HOST", "value": "${module.rds.db_endpoint}"},
-            {"name": "DB_USER", "value": "${var.username}"},
-            {"name": "DB_PASSWORD", "value": "${var.password}"},
+            {"name": "DB_USER", "value": "${var.db_username}"},
+            {"name": "DB_PASSWORD", "value": "${var.db_password}"},
             {"name": "DB_NAME", "value": "${var.db_name}"}
         ],
     EOF
