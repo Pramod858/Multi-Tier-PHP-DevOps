@@ -54,3 +54,14 @@ variable "container_env_vars_config" {
     type = string
     default = ""
 }
+
+variable "min_capacity" {
+    type = number
+    default = 1
+}
+
+variable "max_capacity" {
+    type = number
+    default = 3
+}
+
