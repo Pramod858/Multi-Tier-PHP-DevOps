@@ -38,6 +38,7 @@ module "ecs" {
      
     image_name                = var.image_name
     image_version             = var.image_version
+    acm_domain_name           = var.acm_domain_name
     container_port            = var.container_port
     host_port                 = var.host_port
 

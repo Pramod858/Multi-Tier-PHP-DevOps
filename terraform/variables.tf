@@ -32,6 +32,11 @@ variable "image_version" {
     default = "latest"
 }
 
+variable "acm_domain_name" {
+    type = string
+    default = "pramodpro.xyz"
+}
+
 variable "container_port" {
     type = number
     default = 80
