@@ -35,9 +35,9 @@ module "ecs" {
     private_subnet_2_id       = module.vpc.private_subnet_2_id
     ecs_security_group_id     = module.vpc.ecs_security_group_id
 
-    container_name            = var.container_name
+     
     image_name                = var.image_name
-    image_version =            var.image_version
+    image_version             = var.image_version
     container_port            = var.container_port
     host_port                 = var.host_port
 

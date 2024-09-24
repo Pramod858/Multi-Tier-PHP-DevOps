@@ -30,9 +30,9 @@ variable "private_subnet_2_id" {
     type = string
 }
 
-# variable "image_name" {
-#     type = string
-# }
+variable "image_name" {
+    type = string
+}
 
 variable "image_version" {
     type = string
@@ -53,6 +53,7 @@ variable "container_env_vars_config" {
 
 variable "task_count" {
     type = number
+    default = 1
 }
 
 variable "min_capacity" {

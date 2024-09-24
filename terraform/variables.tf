@@ -22,11 +22,6 @@ variable "db_name" {
     default = "mydb"
 }
 
-variable "container_name" {
-    type = string
-    default = "php-web-app"
-}
-
 variable "image_name" {
     type = string
     default = "pramod858/php-web-app"
