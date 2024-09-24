@@ -77,8 +77,8 @@ resource "aws_ecs_task_definition" "task_definition" {
     container_definitions    = <<EOF
 [
     {
-    "name": "${var.container_name}",
-    "image": "${var.image_name}:${var.image_version}",
+    "name": "${var.environment}",
+    "image": "${data.aws_ecr_repository.service.repository_url}:${var.image_version}",
     "essential": true,
     "portMappings": [
         {
@@ -117,7 +117,7 @@ resource "aws_ecs_service" "ecs_service" {
 
     load_balancer {
         target_group_arn = aws_lb_target_group.target_group.arn
-        container_name   = "${var.container_name}"
+        container_name   = "${var.environment}"
         container_port   = var.container_port
     }
 
