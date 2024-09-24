@@ -20,16 +20,35 @@ resource "aws_lb" "alb" {
 # Target Group
 resource "aws_lb_target_group" "target_group" {
     name        = "${var.environment}-target-group"
-    port        = 80
+    port        = var.container_port
     protocol    = "HTTP"
     vpc_id      = var.vpc_id
     target_type = "ip"
+
+    depends_on = [ aws_lb.alb ]
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "ecs-alb-listener-http" {
     load_balancer_arn = aws_lb.alb.arn
     port              = 80
     protocol          = "HTTP"
+
+    default_action {
+        type = "redirect"
+        
+        redirect {
+            port        = 443
+            protocol    = "HTTPS"
+            status_code = "HTTP_301"
+        }
+    }
+}
+
+resource "aws_lb_listener" "ecs-alb-listener-https" {
+    load_balancer_arn = aws_lb.alb.arn
+    port              = 443
+    protocol          = "HTTPS"
+    certificate_arn   = data.aws_acm_certificate.cert.arn
 
     default_action {
         type             = "forward"
