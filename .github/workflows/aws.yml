@@ -1,0 +1,140 @@
+name: Deploy to Amazon ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Select job to run' 
+        required: true
+        type: choice
+        options:
+          - deploy
+          - infra
+        default: deploy
+      action:
+        description: 'Terraform action (apply or destroy)'
+        required: false
+        type: choice
+        options:
+          - apply
+          - destroy
+        default: apply
+
+env:
+  PROJECT_NAME: php-webapp                # Same as environment variable in Terraform
+  ECR_REPOSITORY: php-webapp-ecr          # Amazon ECR repository name
+  ECS_SERVICE: ecs-service                # Amazon ECS service name
+  ECS_CLUSTER: ecs-cluster                # Amazon ECS cluster name
+  ECS_TASK_DEFINITION: task-definition    # Path to ECS task definition file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: php-webapp             # Name of the container in containerDefinitions section
+
+# permissions:
+#  contents: read
+
+jobs:
+  build-and-push-image:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    environment: development
+    needs: build-and-push-image
+    if: ${{ github.event.inputs.job == 'deploy' || github.event_name == 'push' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download task definition
+      run: aws ecs describe-task-definition \
+            --task-definition "${{ env.PROJECT_NAME }}-${{ env.ECS_TASK_DEFINITION }}" \
+            --query taskDefinition > TaskDefinition.json
+
+    - name: Update ECS task definition with new image
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: TaskDefinition.json
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy updated ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+  infra:
+    name: Update Infrastructure
+    runs-on: ubuntu-latest
+    environment: development
+    needs: build-and-push-image
+    if: ${{ github.event.inputs.job == 'infra' || github.event_name == 'push' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Add image tag to ECS task definition
+      run: sed -i "s|${var.image_version}|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Initialize Terraform
+      run: terraform init -input=false
+      working-directory: ./terraform
+
+    - name: Apply Terraform Plan
+      if: ${{ github.event.inputs.action == 'apply' }}
+      run: terraform apply -auto-approve
+      working-directory: ./terraform
+
+    - name: Destroy Terraform Plan
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: terraform destroy -auto-approve
+      working-directory: ./terraform
