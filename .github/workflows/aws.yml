@@ -33,7 +33,7 @@ env:
 
 jobs:
   build-and-push-image:
-    name: Build and Push Image
+    name: Build and Push Imag
     runs-on: ubuntu-latest
     environment: development
 
@@ -47,7 +47,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
-
+ 
     - name: Log in to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
