@@ -1,5 +1,4 @@
 # Multi-Tier-PHP-DevOps
- 
 
 
-![diagram-export-23-09-2024-22_08_37](https://github.com/user-attachments/assets/ccaabde5-d711-4185-81f5-702050635af9)
+![diagram-export-24-09-2024-21_24_23](https://github.com/user-attachments/assets/7dfe967f-cae6-42ad-a4fe-7416bb0afb27)
