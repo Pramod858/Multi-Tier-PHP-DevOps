@@ -27,7 +27,7 @@ env:
   ECR_REPOSITORY: php-webapp-ecr          # Amazon ECR repository name
   ECS_SERVICE: ecs-service                # Amazon ECS service name
   ECS_CLUSTER: ecs-cluster                # Amazon ECS cluster name
-  ECS_TASK_DEFINITION: task-definition    # Name of the task definition
+  ECS_TASK_DEFINITION: task-definition    # Name of the ECS task definition
   CONTAINER_NAME: php-webapp              # Name of the container in containerDefinitions section
 
 permissions:
@@ -88,12 +88,12 @@ jobs:
           --query "taskDefinition" > TaskDefinition.json
 
     - name: Update ECS task definition with new image
-      run: sed -i "s|<image_tag>|${{ steps.build-image.outputs.image }}|g" TaskDefinition.json
+      run: sed -i "s|__IMAGE_TAG__|${{ steps.build-image.outputs.IMAGE_TAG }}|g" TaskDefinition.json
 
     - name: Deploy updated ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        task-definition: TaskDefinition.json
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: true
@@ -109,7 +109,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Replace image tag in ECS Terraform module
-      run: sed -i "s|<image_tag>|${{ steps.build-image.outputs.image }}|g" ./terraform/modules/ecs/ecs.tf
+      run: sed -i "s|__IMAGE_TAG__|${{ steps.build-image.outputs.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
 
     - name: Set up AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
