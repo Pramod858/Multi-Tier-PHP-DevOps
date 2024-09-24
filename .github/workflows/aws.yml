@@ -88,7 +88,7 @@ jobs:
           --query "taskDefinition" > TaskDefinition.json
 
     - name: Update ECS task definition with new image
-      run: sed -i "s|<image_tag>|${{ steps.build-image.outputs.IMAGE_TAG }}|g" TaskDefinition.json
+      run: sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" TaskDefinition.json
 
     - name: Deploy updated ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -109,7 +109,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Replace image tag in ECS Terraform module
-      run: sed -i "s|<image_tag>|${{ steps.build-image.outputs.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+      run: sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
 
     - name: Set up AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
