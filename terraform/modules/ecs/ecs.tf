@@ -142,6 +142,7 @@ resource "aws_ecs_service" "ecs_service" {
 
     depends_on = [
         aws_ecs_task_definition.task_definition,
-        aws_lb_listener.front_end
+        aws_lb_listener.ecs-alb-listener-http,
+        aws_lb_listener.ecs-alb-listener-http
     ]
 }
