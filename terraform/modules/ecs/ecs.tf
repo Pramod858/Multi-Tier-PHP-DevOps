@@ -78,7 +78,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 [
     {
     "name": "${var.environment}",
-    "image": "${data.aws_ecr_repository.service.repository_url}:${var.image_version}",
+    "image": "${data.aws_ecr_repository.service.repository_url}:<image_tag>",
     "essential": true,
     "portMappings": [
         {
