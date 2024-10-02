@@ -51,3 +51,9 @@ variable "key_name" {
     type = string
     default = "AWS"
 }
+
+#you hosted zone domain name
+variable "domain_name" {
+    type = string
+    default = "pramodpro.xyz"
+}
