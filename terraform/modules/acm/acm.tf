@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "cert" {
-    domain_name = var.acm_domain_name
+    domain_name = var.my_domain_name
     validation_method = "DNS"
 
     # Optionally add subject alternative names
@@ -8,7 +8,7 @@ resource "aws_acm_certificate" "cert" {
     # ]
 
     lifecycle {
-        create_before_destroy = true  // Ensures that a new certificate is created before the old one is destroyed
+        create_before_destroy = true   
     }
 }
 

@@ -38,10 +38,6 @@ variable "image_version" {
     type = string
 }
 
-variable "acm_domain_name" {
-    type = string
-}
-
 variable "container_port" {
     type = number
 }
@@ -69,7 +65,6 @@ variable "max_capacity" {
     type = number
     default = 3
 }
-
 
 variable "acm_certificate_arn" {
     type = string

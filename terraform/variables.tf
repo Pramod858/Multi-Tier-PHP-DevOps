@@ -32,11 +32,6 @@ variable "image_version" {
     default = "latest"
 }
 
-variable "acm_domain_name" {
-    type = string
-    default = "app.pramodpro.xyz"
-}
-
 variable "container_port" {
     type = number
     default = 80
@@ -52,8 +47,14 @@ variable "key_name" {
     default = "AWS"
 }
 
-#you hosted zone domain name
+# Your hosted zone domain name
 variable "domain_name" {
     type = string
     default = "pramodpro.xyz"
+}
+
+# Your application domain name
+variable "my_domain_name" {
+    type = string
+    default = "app.pramodpro.xyz"
 }

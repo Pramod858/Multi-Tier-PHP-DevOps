@@ -26,7 +26,7 @@ module "acm" {
     source             = "./modules/acm"
     depends_on         = [ module.vpc ]
     domain_name        = var.domain_name
-    acm_domain_name    = var.acm_domain_name
+    my_domain_name     = var.my_domain_name
 }
 
 module "ecs" {
@@ -45,7 +45,6 @@ module "ecs" {
     acm_certificate_arn       = module.acm.acm_certificate_arn
     image_name                = var.image_name
     image_version             = var.image_version
-    acm_domain_name           = var.acm_domain_name
     container_port            = var.container_port
     host_port                 = var.host_port
 
@@ -72,10 +71,12 @@ module "ec2" {
 }
 
 module "route53" {
-    source       = "./modules/route53"
-    depends_on   = [ module.ecs, module.acm ]
+    source          = "./modules/route53"
+    depends_on      = [ module.ecs, module.acm ]
+    domain_name     = var.domain_name
+    my_domain_name  = var.my_domain_name
     route53_zone_id = module.acm.route53_zone_id
-    domain_name  = var.domain_name
-    alb_dns_name = module.ecs.alb_dns_addr
-    alb_zone_id  = module.ecs.alb_zone_id 
+    
+    alb_dns_name    = module.ecs.alb_dns_addr
+    alb_zone_id     = module.ecs.alb_zone_id 
 }
