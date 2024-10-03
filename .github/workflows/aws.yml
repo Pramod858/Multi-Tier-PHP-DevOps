@@ -92,14 +92,14 @@ jobs:
       id: task-def
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      uses: aws-actions/amazon-ecs-render-task-definition@v1.3.0
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: TaskDefinition.json
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ env.APP_IMAGE }}
 
     - name: Deploy updated ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: TaskDefinition.json
         service: "${{ env.PROJECT_NAME }}-${{ env.ECS_SERVICE }}"
