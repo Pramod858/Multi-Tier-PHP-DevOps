@@ -64,3 +64,12 @@ module "ec2" {
     key_name                   = var.key_name
 }
 
+module "route53" {
+    source       = "./modules/route53"
+
+    depends_on   = [ module.ecs ]
+    domain_name  = var.domain_name
+    alb_dns_name = module.ecs.alb_dns_addr
+    alb_zone_id  = module.ecs.alb_zone_id 
+
+}
