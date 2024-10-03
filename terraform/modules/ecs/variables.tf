@@ -10,10 +10,6 @@ variable "vpc_id" {
     type = string
 }
 
-variable "ecs_security_group_id" {
-    type = string
-}
-
 variable "public_subnet_1_id" {
     type = string
 }
@@ -30,15 +26,19 @@ variable "private_subnet_2_id" {
     type = string
 }
 
+variable "ecs_security_group_id" {
+    type = string
+}
+
+variable "acm_certificate_arn" {
+    type = string
+}
+
 variable "image_name" {
     type = string
 }
 
 variable "image_version" {
-    type = string
-}
-
-variable "acm_domain_name" {
     type = string
 }
 
@@ -69,5 +69,4 @@ variable "max_capacity" {
     type = number
     default = 3
 }
-
 
