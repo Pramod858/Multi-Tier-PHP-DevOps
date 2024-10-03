@@ -24,10 +24,8 @@ module "rds" {
 
 module "acm" {
     source             = "./modules/acm"
-
     depends_on         = [ module.vpc ]
     domain_name        = var.domain_name
-    route53_zone_id    = module.route53.route53_zone_id
     acm_domain_name    = var.acm_domain_name
 }
 
@@ -75,7 +73,9 @@ module "ec2" {
 
 module "route53" {
     source       = "./modules/route53"
-    depends_on   = [ module.ecs ]
+    depends_on   = [ module.ecs, module.acm ]
+    route53_zone_id = module.acm.route53_zone_id
+    domain_name  = var.domain_name
     alb_dns_name = module.ecs.alb_dns_addr
     alb_zone_id  = module.ecs.alb_zone_id 
 }
