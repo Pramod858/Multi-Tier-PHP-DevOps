@@ -9,5 +9,3 @@ COPY ./html /var/www/html/
 
 # Provide write access to Apache web server
 RUN chown -R www-data:www-data /var/www/html
-
-EXPOSE 3000

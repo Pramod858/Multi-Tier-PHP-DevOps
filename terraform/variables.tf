@@ -34,7 +34,7 @@ variable "image_version" {
 
 variable "container_port" {
     type = number
-    default = 3000
+    default = 80
 }
 
 variable "host_port" {
