@@ -15,6 +15,7 @@ on:
         description: 'ECR Repository Name'
         required: true
         type: string
+        default: php-webapp-ecr
 
 jobs:
   ecr:
