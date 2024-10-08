@@ -40,6 +40,7 @@ module "ecs" {
     public_subnet_2_id        = module.vpc.public_subnet_2_id
     private_subnet_1_id       = module.vpc.private_subnet_1_id
     private_subnet_2_id       = module.vpc.private_subnet_2_id
+    alb_security_group_id     = module.vpc.alb_security_group_id
     ecs_security_group_id     = module.vpc.ecs_security_group_id
 
     acm_certificate_arn       = module.acm.acm_certificate_arn
