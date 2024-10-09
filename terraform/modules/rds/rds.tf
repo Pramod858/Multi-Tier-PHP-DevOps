@@ -11,7 +11,7 @@ resource "aws_rds_cluster" "db_cluster" {
     cluster_identifier      = "${var.environment}-db-cluster"
     engine                  = "aurora-mysql"
     engine_mode             = "serverless"
-    engine_version          = "5.7.mysql_aurora.2.11.4"
+    engine_version          = "5.7.mysql_aurora.2.11.5"
     port                    = "3306"
     database_name           = var.db_name
     master_username         = var.db_username
