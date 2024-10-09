@@ -1,27 +1,146 @@
-# Sample workflow to access AWS resources when workflow is tied to branch
-# The workflow Creates static website using aws s3
-name: AWS example workflow
+name: Deploy to Amazon ECS
+
 on:
-  push
+  # push:
+  #   branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Select job to run'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - infra
+        default: deploy
+      action:
+        description: 'Terraform action (apply or destroy)'
+        required: false
+        type: choice
+        options:
+          - apply
+          - destroy
+        default: apply
+
 env:
-  BUCKET_NAME : pramod858tf
+  IMAGE_TAG: ${{ github.sha }}
+  PROJECT_NAME: php-webapp                # Same as environment variable in Terraform
+  ECR_REPOSITORY: php-webapp-ecr          # Amazon ECR repository name
+  ECS_SERVICE: ecs-service                # Amazon ECS service name
+  ECS_CLUSTER: ecs-cluster                # Amazon ECS cluster name
+  ECS_TASK_DEFINITION: task-definition    # Name of the ECS task definition
+  CONTAINER_NAME: php-webapp              # Name of the container in containerDefinitions section
+
 # permission can be added at job level or workflow level
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
+
 jobs:
-  S3PackageUpload:
+  build-and-push-image:
+    name: Build and Push Image
     runs-on: ubuntu-latest
+    environment: development
+
     steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@4
-        with:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
           role-session-name: samplerolesession
           aws-region: ${{ secrets.AWS_REGION }}
-      # Upload a file to AWS s3
-      - name:  Copy index.html to s3
-        run: |
-          aws s3 cp ./README.md s3://${{ env.BUCKET_NAME }}/
+
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: ${{ github.event.inputs.job == 'deploy' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+          role-session-name: samplerolesession
+          aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download task definition
+      run: |
+        echo "APP_IMAGE=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+        aws ecs describe-task-definition \
+          --task-definition "${{ env.PROJECT_NAME }}-${{ env.ECS_TASK_DEFINITION }}" \
+          --query "taskDefinition" > TaskDefinition.json
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: TaskDefinition.json
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ env.APP_IMAGE }}
+
+    - name: Deploy updated ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: TaskDefinition.json
+        service: "${{ env.PROJECT_NAME }}-${{ env.ECS_SERVICE }}"
+        cluster: "${{ env.PROJECT_NAME }}-${{ env.ECS_CLUSTER }}"
+        wait-for-service-stability: true
+
+  infra:
+    name: Update Infrastructure
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: ${{ github.event.inputs.job == 'infra' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Replace image tag in ECS Terraform module
+      run: sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+          role-session-name: samplerolesession
+          aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Initialize Terraform
+      run: terraform init -input=false
+      working-directory: ./terraform
+
+    - name: Apply Terraform Plan
+      if: ${{ github.event.inputs.action == 'apply' }}
+      run: terraform apply -auto-approve
+      working-directory: ./terraform
+
+    - name: Destroy Terraform Plan
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: terraform destroy -auto-approve
+      working-directory: ./terraform
