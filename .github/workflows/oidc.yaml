@@ -46,12 +46,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@4
       with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
-          role-session-name: samplerolesession
-          aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Log in to Amazon ECR
       id: login-ecr
@@ -76,12 +76,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@4
       with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
-          role-session-name: samplerolesession
-          aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Download task definition
       run: |
@@ -121,12 +121,12 @@ jobs:
     - name: Replace image tag in ECS Terraform module
       run: sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
 
-    - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@4
       with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
-          role-session-name: samplerolesession
-          aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
