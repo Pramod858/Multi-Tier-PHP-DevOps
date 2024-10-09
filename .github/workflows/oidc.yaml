@@ -2,6 +2,24 @@ name: AWS example workflow
 on:
   # push
   workflow_dispatch:
+    inputs:
+      job:
+        description: 'Select job to run'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - infra
+        default: deploy
+      action:
+        description: 'Terraform action (apply or destroy)'
+        required: false
+        type: choice
+        options:
+          - apply
+          - destroy
+        default: apply
+        
 env:
   BUCKET_NAME : pramod858tf
   IMAGE_TAG: ${{ github.sha }}
@@ -40,3 +58,40 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  infra:
+    name: Update Infrastructure
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: ${{ github.event.inputs.job == 'infra' }}
+
+    steps:
+    - name: Git clone the repository
+      uses: actions/checkout@v4
+
+    - name: Replace image tag in ECS Terraform module
+      run: sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Initialize Terraform
+      run: terraform init -input=false
+      working-directory: ./terraform
+
+    - name: Apply Terraform Plan
+      if: ${{ github.event.inputs.action == 'apply' }}
+      run: terraform apply -auto-approve
+      working-directory: ./terraform
+
+    - name: Destroy Terraform Plan
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: terraform destroy -auto-approve
+      working-directory: ./terraform
