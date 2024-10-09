@@ -1,14 +1,18 @@
 name: AWS example workflow
 on:
-  push
+  # push
+  workflow_dispatch:
 env:
   BUCKET_NAME : pramod858tf
+  IMAGE_TAG: ${{ github.sha }}
+  ECR_REPOSITORY: php-webapp-ecr 
 # permission can be added at job level or workflow level
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
 jobs:
-  S3PackageUpload:
+  build-and-push-image:
+    name: Build and Push Image
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -20,6 +24,19 @@ jobs:
           role-session-name: samplerolesession
           aws-region: ${{ secrets.AWS_REGION }}
       # Upload a file to AWS s3
-      - name:  Copy index.html to s3
+      # - name:  Copy index.html to s3
+      #   run: |
+      #     aws s3 cp ./README.md s3://${{ env.BUCKET_NAME }}/
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          aws s3 cp ./README.md s3://${{ env.BUCKET_NAME }}/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
