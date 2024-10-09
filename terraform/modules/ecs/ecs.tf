@@ -8,7 +8,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_lb" "alb" {
     name               = "${var.environment}-alb"
     load_balancer_type = "application"
-    security_groups    = [var.ecs_security_group_id]
+    security_groups    = [var.alb_security_group_id]
     subnets            = [var.public_subnet_1_id,var.public_subnet_2_id]
     ip_address_type    = "ipv4" 
 
@@ -141,6 +141,7 @@ resource "aws_ecs_service" "ecs_service" {
     }
 
     depends_on = [
+        aws_ecs_cluster.ecs_cluster,
         aws_ecs_task_definition.task_definition,
         aws_lb_listener.ecs-alb-listener-http,
         aws_lb_listener.ecs-alb-listener-https
