@@ -38,14 +38,6 @@ variable "acm_certificate_arn" {
     type = string
 }
 
-variable "image_name" {
-    type = string
-}
-
-variable "image_version" {
-    type = string
-}
-
 variable "container_port" {
     type = number
 }
