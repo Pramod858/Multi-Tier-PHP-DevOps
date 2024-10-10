@@ -39,16 +39,13 @@ jobs:
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
+        
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/OIDC-Role
           role-session-name: samplerolesession
           aws-region: ${{ secrets.AWS_REGION }}
-      # Upload a file to AWS s3
-      # - name:  Copy index.html to s3
-      #   run: |
-      #     aws s3 cp ./README.md s3://${{ env.BUCKET_NAME }}/
 
       - name: Log in to Amazon ECR
         id: login-ecr
