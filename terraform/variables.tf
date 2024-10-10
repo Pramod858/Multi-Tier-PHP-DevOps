@@ -22,24 +22,14 @@ variable "db_name" {
     default = "mydb"
 }
 
-variable "image_name" {
-    type = string
-    default = "pramod858/php-web-app"
-}
-
-variable "image_version" {
-    type = string
-    default = "latest"
-}
-
 variable "container_port" {
     type = number
-    default = 80
+    default = 3000
 }
 
 variable "host_port" {
     type = number
-    default = 80
+    default = 3000
 }
 
 variable "key_name" {
