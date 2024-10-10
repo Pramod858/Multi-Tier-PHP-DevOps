@@ -42,6 +42,8 @@ resource "aws_lb_listener" "ecs-alb-listener-http" {
             status_code = "HTTP_301"
         }
     }
+
+    depends_on = [aws_lb.alb, aws_lb_target_group.target_group]
 }
 
 resource "aws_lb_listener" "ecs-alb-listener-https" {
@@ -54,6 +56,8 @@ resource "aws_lb_listener" "ecs-alb-listener-https" {
         type             = "forward"
         target_group_arn = aws_lb_target_group.target_group.arn
     }
+
+    depends_on = [aws_lb.alb, aws_lb_target_group.target_group]
 }
 
 resource "aws_cloudwatch_log_group" "ecs" {
