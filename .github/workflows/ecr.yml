@@ -17,6 +17,9 @@ on:
         type: string
         default: php-webapp-ecr
 
+permissions:
+  id-token: write   # This is required for requesting the JWT
+
 jobs:
   ecr:
     runs-on: ubuntu-latest
