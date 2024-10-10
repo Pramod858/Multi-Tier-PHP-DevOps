@@ -44,6 +44,8 @@ module "ecs" {
     ecs_security_group_id     = module.vpc.ecs_security_group_id
 
     acm_certificate_arn       = module.acm.acm_certificate_arn
+    image_name                = var.image_name
+    image_version             = var.image_version
     container_port            = var.container_port
     host_port                 = var.host_port
 
